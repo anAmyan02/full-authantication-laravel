@@ -53,13 +53,13 @@ class AuthController extends Controller
  
         $request->session()->regenerate();
  
-        // if (auth()->user()->type == 'admin') {
-        //     return redirect()->route('admin/home');
-        // } else {
+        if (auth()->user()->type == 'admin') {
+            return redirect()->route('admin/home');
+        } else {
             return redirect()->route('home');
-        // }
+        }
          
-        // return redirect()->route('dashboard');
+        return redirect()->route('dashboard');
     }
  
     public function logout(Request $request)
@@ -71,8 +71,8 @@ class AuthController extends Controller
         return redirect('/login');
     }
  
-    // public function profile()
-    // {
-    //     return view('userprofile');
-    // }
+    public function profile()
+    {
+        return view('userprofile');
+    }
 }
