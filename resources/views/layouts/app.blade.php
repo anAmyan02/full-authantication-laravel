@@ -107,13 +107,20 @@
                         <span class="text-[15px] ml-4 text-gray-200 font-bold">Profile</span>
                     </div>
                 </a>
-                <a href="{{ route('logout') }}">
+                <!-- <a href="{{ route('admin.logout') }}">
                     <div class="my-4 bg-gray-600 h-[1px]"></div>
                     <div class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
                         <i class="bi bi-box-arrow-in-right"></i>
                         <span class="text-[15px] ml-4 text-gray-200 font-bold">Logout</span>
                     </div>
-                </a>
+                </a> -->
+                <form method="POST" action="{{ route('admin.logout') }}">
+                    @csrf
+                    <button type="submit" class="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span class="text-[15px] ml-4 text-gray-200 font-bold">Logout</span>
+                    </button>
+                </form>
             </div>
         </div>
         <div class="flex flex-col w-full h-screen px-4 py-8 mt-10">
