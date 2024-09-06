@@ -3,71 +3,65 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AdminAuthController extends Controller
 {
-    public function register(){
-        return view('auth/register');
+    public function register()
+    {
+        return view('admin.auth.register');
     }
 
     public function registerSave(Request $request)
     {
         Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:admins,email',
             'password' => 'required|confirmed'
         ])->validate();
- 
-        User::create([
+
+        Admin::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'type' => "0"
         ]);
- 
-        return redirect()->route('login');
+
+        return redirect()->route('admin.login');
     }
 
     public function login()
     {
-        return view('auth/login');
+        return view('admin.auth.login');
     }
- 
+
     public function loginAction(Request $request)
     {
         Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ])->validate();
- 
-        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+
+        if (!Auth::guard('admin')->attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed')
+                'email' => trans('auth.failed'),
             ]);
         }
- 
+
         $request->session()->regenerate();
 
-        return redirect()->route('home');
+        return redirect()->route('admin.dashboard');
     }
- 
+
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
- 
+        Auth::guard('admin')->logout();
+
         $request->session()->invalidate();
- 
-        return redirect('/login');
-    }
- 
-    public function profile()
-    {
-        return view('userprofile');
+
+        return redirect()->route('admin.login');
     }
 }
