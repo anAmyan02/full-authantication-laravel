@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Password;
 
 class AdminAuthController extends Controller
 {
@@ -64,4 +65,45 @@ class AdminAuthController extends Controller
 
         return redirect()->route('admin.login');
     }
+    
+
+    public function showForgotPasswordForm()
+    {
+        return view('admin.auth.forgot-password');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::broker('admins')->sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+                    ? back()->with('status', __($status))
+                    : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function showResetPasswordForm(Request $request, $token = null)
+    {
+        return view('admin.auth.reset-password', ['token' => $token]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed',
+        ]);
+
+        $status = Password::broker('admins')->reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($admin, $password) {
+            $admin->password = Hash::make($password);
+            $admin->save();
+        });
+
+        return $status === Password::PASSWORD_RESET
+                    ? redirect()->route('admin.login')->with('status', __($status))
+                    : back()->withErrors(['email' => __($status)]);
+    }
+
 }
